@@ -15,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -24,6 +25,7 @@ public class PurchaseService {
     public void createOrder(Map<String, String> params) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         // Generate signature
         String signature = calculateSignature(params, "00112233445566778899aabbccddeeff");
+        System.out.println("Signature: " + signature);
         // Send to modulebank
         params.put("signature", signature);
         sendOrderToModulbank(params);
@@ -32,8 +34,13 @@ public class PurchaseService {
 
     private void sendOrderToModulbank(Map<String, String> params) {
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<Map<String, String>> request = new HttpEntity<>(params, headers);
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        LinkedMultiValueMap<String, String> data = new LinkedMultiValueMap<>(params.size());
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            data.add(entry.getKey(), entry.getValue());
+        }
+
+        HttpEntity<LinkedMultiValueMap<String, String>> request = new HttpEntity<>(data, headers);
 
         RestTemplate template = new RestTemplate();
         ResponseEntity<String> entity = template.postForEntity(MODULBANK_API_URL, request, String.class);
