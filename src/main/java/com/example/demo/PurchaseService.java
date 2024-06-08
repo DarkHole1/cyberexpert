@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -31,8 +32,8 @@ public class PurchaseService {
         HttpEntity<Map<String, String>> request = new HttpEntity<>(params);
 
         RestTemplate template = new RestTemplate();
-        URI location = template.postForLocation(MODULBANK_API_URL, request);
-        System.out.println(location);
+        ResponseEntity<String> entity = template.postForEntity(MODULBANK_API_URL, request, String.class);
+        System.out.println(entity);
     } 
 
     private String calculateSignature(Map<String, String> params, String key)
