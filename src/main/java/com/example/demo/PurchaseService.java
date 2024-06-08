@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -29,7 +31,9 @@ public class PurchaseService {
     }
 
     private void sendOrderToModulbank(Map<String, String> params) {
-        HttpEntity<Map<String, String>> request = new HttpEntity<>(params);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<Map<String, String>> request = new HttpEntity<>(params, headers);
 
         RestTemplate template = new RestTemplate();
         ResponseEntity<String> entity = template.postForEntity(MODULBANK_API_URL, request, String.class);
