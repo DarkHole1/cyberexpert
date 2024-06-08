@@ -15,6 +15,7 @@ public class PurchaseService {
     public void createOrder(Map<String, String> params) throws NoSuchAlgorithmException {
         // Generate signature
         String signature = calculateSignature(params, "00112233445566778899aabbccddeeff");
+        System.out.println(signature);
         // Send to modulebank
         // Save to database
     }
@@ -33,13 +34,15 @@ public class PurchaseService {
 
     private String calculateDigest(String queryString, String key) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("SHA-1");
-        md.update(key.getBytes());
+        HexFormat hf = HexFormat.of();
+        byte[] keyBytes = hf.parseHex(key);
+        md.update(keyBytes);
         md.update(queryString.getBytes());
         byte[] digest = md.digest();
         md.reset();
-        md.update(key.getBytes());
+        md.update(keyBytes);
         md.update(digest);
         byte[] result = md.digest();
-        return HexFormat.of().formatHex(result);
+        return hf.formatHex(result);
     }
 }
