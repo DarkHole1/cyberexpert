@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
@@ -9,16 +10,30 @@ import java.util.HexFormat;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 public class PurchaseService {
+    private static final String MODULBANK_API_URL = "https://pay.modulbank.ru/pay";
+
     public void createOrder(Map<String, String> params) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         // Generate signature
         String signature = calculateSignature(params, "00112233445566778899aabbccddeeff");
         // Send to modulebank
+        params.put("signature", signature);
+        sendOrderToModulbank(params);
         // Save to database
     }
+
+    private void sendOrderToModulbank(Map<String, String> params) {
+        HttpEntity<Map<String, String>> request = new HttpEntity<>(params);
+
+        RestTemplate template = new RestTemplate();
+        URI location = template.postForLocation(MODULBANK_API_URL, request);
+        System.out.println(location);
+    } 
 
     private String calculateSignature(Map<String, String> params, String key)
             throws NoSuchAlgorithmException, UnsupportedEncodingException {
