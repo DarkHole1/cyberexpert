@@ -3,7 +3,7 @@ package com.example.demo;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,7 +12,7 @@ public class PurchaseController {
     @Autowired
     private PurchaseService purchaseService;
 
-    @GetMapping("/create-order")
+    @PostMapping("/create-order")
     public Status createOrder(@RequestParam Map<String, String> allParams) {
         try {
             purchaseService.createOrder(allParams);
