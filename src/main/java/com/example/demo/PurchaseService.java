@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
@@ -12,15 +13,15 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class PurchaseService {
-    public void createOrder(Map<String, String> params) throws NoSuchAlgorithmException {
+    public void createOrder(Map<String, String> params) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         // Generate signature
         String signature = calculateSignature(params, "00112233445566778899aabbccddeeff");
-        System.out.println(signature);
         // Send to modulebank
         // Save to database
     }
 
-    private String calculateSignature(Map<String, String> params, String key) throws NoSuchAlgorithmException {
+    private String calculateSignature(Map<String, String> params, String key)
+            throws NoSuchAlgorithmException, UnsupportedEncodingException {
         String queryString = params.entrySet().stream()
                 .filter(entry -> entry.getValue().length() > 0)
                 .sorted(Comparator.comparing(Map.Entry::getKey))
@@ -32,16 +33,17 @@ public class PurchaseService {
         return calculateDigest(queryString, key);
     }
 
-    private String calculateDigest(String queryString, String key) throws NoSuchAlgorithmException {
+    private String calculateDigest(String queryString, String key)
+            throws NoSuchAlgorithmException, UnsupportedEncodingException {
         MessageDigest md = MessageDigest.getInstance("SHA-1");
         HexFormat hf = HexFormat.of();
-        byte[] keyBytes = hf.parseHex(key);
-        md.update(keyBytes);
-        md.update(queryString.getBytes());
-        byte[] digest = md.digest();
+        md.update(key.getBytes("UTF-8"));
+        md.update(queryString.getBytes("UTF-8"));
+        String digest = hf.formatHex(md.digest());
+
         md.reset();
-        md.update(keyBytes);
-        md.update(digest);
+        md.update(key.getBytes("UTF-8"));
+        md.update(digest.getBytes("UTF-8"));
         byte[] result = md.digest();
         return hf.formatHex(result);
     }

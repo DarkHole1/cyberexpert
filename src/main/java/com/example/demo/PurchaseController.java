@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
@@ -20,7 +21,7 @@ public class PurchaseController {
             return new Status(true, "Payment created");
         } catch(UnsupportedOperationException e) {
             return new Status(false, "Not implemented");
-        } catch(NoSuchAlgorithmException e) {
+        } catch(NoSuchAlgorithmException | UnsupportedEncodingException e) {
             return new Status(false, "Internal Error");
         }
     }
