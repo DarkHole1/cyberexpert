@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,8 @@ public class PurchaseController {
             return new Status(true, "Payment created");
         } catch(UnsupportedOperationException e) {
             return new Status(false, "Not implemented");
+        } catch(NoSuchAlgorithmException e) {
+            return new Status(false, "Internal Error");
         }
     }
 }
